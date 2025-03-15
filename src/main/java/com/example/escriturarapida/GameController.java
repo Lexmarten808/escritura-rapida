@@ -39,6 +39,10 @@ public class GameController implements Initializable {
     private Label levelLabel;
     @FXML
     private TextField inputField;
+    @FXML
+    private Label inputInfo;
+
+    private int levelCounter = 0; // Contador para controlar la reducción de tiempo
 
     private Timeline timeline; // Temporizador del juego
     private int totalTime = 20;
@@ -157,7 +161,7 @@ public class GameController implements Initializable {
 
     /**
      * Verifica si la palabra ingresada es correcta.
-     * Si es correcta, aumenta el puntaje y el tiempo.
+     * Si es correcta, aumenta el puntaje y el tiempo y le hace set al input label como "palabra correcta"
      * Si es incorrecta, resta vidas y tiempo.
      */
     private void checkWord() {
@@ -166,16 +170,25 @@ public class GameController implements Initializable {
         if (inputText.equalsIgnoreCase(currentWord)) {
             score += 5;
             level++;
+            levelCounter++;
             scoreLabel.setText("SCORE: " + score);
             levelLabel.setText("LEVEL: " + level);
+            System.out.println("level counter: " + levelCounter);
+            inputInfo.setText("!PALABRA CORRECTA¡");//muestra si la palabra es correcta usando la etiqueta
 
-            timeLeft += 5;
-            timeline.stop();
-            startTimer();
-            showRandomWord();
+            if (levelCounter == 5 && totalTime > 2) {
+                totalTime = totalTime - 2;
+                levelCounter = 0; // Reiniciar el contador de niveles
+            }
+
+            timeline.stop();  // Detener el temporizador actual
+            startTimer();     // Reiniciar con el nuevo tiempo total
+            showRandomWord(); // Mostrar una nueva palabra
+
         } else {
+            inputInfo.setText("!PALABRA INCORRECTA¡");
             loseLife();
-            timeLeft -= 3;
+            timeLeft -= 3; // reduce 3 seg si la palabra es incorrecta
             if (score > 0) {
                 score -= 2;
             }
@@ -183,6 +196,8 @@ public class GameController implements Initializable {
         }
         inputField.clear();
     }
+
+
 
     /**
      * Reduce una vida al jugador y actualiza la imagen.

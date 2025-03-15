@@ -32,5 +32,6 @@
       <Label layoutX="454.0" layoutY="376.0" prefHeight="18.0" prefWidth="120.0" text="AUTHOR: Brandon L.A" />
       <Label />
       <ImageView fx:id="SunImages" fitHeight="150.0" fitWidth="200.0" layoutX="233.0" layoutY="42.0" pickOnBounds="true" preserveRatio="true" />
+      <Label fx:id="inputInfo" alignment="CENTER" layoutX="140.0" layoutY="355.0" prefHeight="18.0" prefWidth="331.0" />
    </children>
 </AnchorPane>
