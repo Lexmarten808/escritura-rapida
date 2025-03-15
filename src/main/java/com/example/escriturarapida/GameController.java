@@ -2,7 +2,6 @@ package com.example.escriturarapida;
 
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
-import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -19,7 +18,11 @@ import java.util.List;
 import java.util.Random;
 import java.util.ResourceBundle;
 
-
+/**
+ * Controlador del juego de escritura rapida.
+ * Maneja la logica del juego, incluyendo el temporizador, puntuacion, nivel y vidas.
+ *
+ */
 public class GameController implements Initializable {
 
     @FXML
@@ -37,36 +40,40 @@ public class GameController implements Initializable {
     @FXML
     private TextField inputField;
 
-    //timer
-    private Timeline timeline;
+    private Timeline timeline; // Temporizador del juego
     private int totalTime = 20;
     private int timeLeft;
     private int score = 0;
     private int level = 1;
     private int lives = 4;
 
-    //word list
-    private List<String> wordList = new ArrayList<>();
-    private String currentWord;
-    private final String[] sunImages = {"/com/example/escriturarapida/images/sun1.png",
+    private List<String> wordList = new ArrayList<>(); // Lista de palabras
+    private String currentWord; // Palabra actual en pantalla
+
+    private final String[] sunImages = {
+            "/com/example/escriturarapida/images/sun1.png",
             "/com/example/escriturarapida/images/sun2.png",
             "/com/example/escriturarapida/images/sun3.png",
-            "/com/example/escriturarapida/images/sun4.png"};
+            "/com/example/escriturarapida/images/sun4.png"
+    };
 
+    /**
+     * Inicializa el juego configurando eventos, imagenes y temporizador.
+     */
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
         inputField.setOnAction(event -> checkWord());
         if (SunImages != null) {
             SunImages.setImage(new Image(getClass().getResource(sunImages[0]).toExternalForm()));
         }
-
         initializeWordList();
         showRandomWord();
         startTimer();
-
-
     }
 
+    /**
+     * Llena la lista de palabras para el juego.
+     */
     private void initializeWordList() {
         wordList.add("javafx");
         wordList.add("programar");
@@ -80,6 +87,9 @@ public class GameController implements Initializable {
         wordList.add("escritura rapida");
     }
 
+    /**
+     * Muestra una palabra aleatoria en pantalla.
+     */
     private void showRandomWord() {
         if (wordList.isEmpty()) {
             wordLabel.setText("No hay palabras");
@@ -90,11 +100,19 @@ public class GameController implements Initializable {
         wordLabel.setText(currentWord);
     }
 
+    /**
+     * Configura la duracion del temporizador.
+     *
+     * @param seconds Duracion en segundos.
+     */
     public void setTimerDuration(int seconds) {
         this.totalTime = seconds;
         this.timeLeft = seconds;
     }
 
+    /**
+     * Inicia el temporizador del juego.
+     */
     private void startTimer() {
         timeLeft = totalTime;
         timerLabel.setText("TIMER: " + timeLeft);
@@ -104,24 +122,32 @@ public class GameController implements Initializable {
         timeline.play();
     }
 
+    /**
+     * Actualiza la interfaz del temporizador.
+     */
     private void updateTimerUI() {
         timeLeft--;
         timerLabel.setText("TIMER: " + timeLeft);
         timerBar.setProgress((double) timeLeft / totalTime);
 
         if (timeLeft <= 0) {
-            timeLeft = 0;
             timeline.stop();
             loseLife();
             startTimer();
         }
     }
 
+    /**
+     * Metodo asociado a un boton para enviar la palabra ingresada.
+     */
     @FXML
     void OnActionSumbitWord(ActionEvent event) {
         checkWord();
     }
 
+    /**
+     * Metodo para detectar la tecla Enter y enviar la palabra ingresada.
+     */
     @FXML
     void OnActionSumbitWordUsingEnter(KeyEvent event) {
         if (event.getCode().toString().equals("ENTER")) {
@@ -129,6 +155,11 @@ public class GameController implements Initializable {
         }
     }
 
+    /**
+     * Verifica si la palabra ingresada es correcta.
+     * Si es correcta, aumenta el puntaje y el tiempo.
+     * Si es incorrecta, resta vidas y tiempo.
+     */
     private void checkWord() {
         String inputText = inputField.getText().trim();
 
@@ -137,55 +168,56 @@ public class GameController implements Initializable {
             level++;
             scoreLabel.setText("SCORE: " + score);
             levelLabel.setText("LEVEL: " + level);
-            System.out.println("Nivel actual: " + level);
 
-            //if true add 5s to the timer
-            timeLeft +=5;
+            timeLeft += 5;
             timeline.stop();
             startTimer();
             showRandomWord();
-
-            //if false lose life and -3 to the timer
         } else {
             loseLife();
-            timeLeft-=3;
-
-            if (score > 0) {  // ensures to remove 2 points only if the score is > 0
-                score -= 2;}
-
+            timeLeft -= 3;
+            if (score > 0) {
+                score -= 2;
+            }
             scoreLabel.setText("SCORE: " + score);
-
         }
-
-        inputField.clear(); //clears the input field
+        inputField.clear();
     }
 
+    /**
+     * Reduce una vida al jugador y actualiza la imagen.
+     * Si las vidas llegan a 0, finaliza el juego.
+     */
     private void loseLife() {
         if (lives > 0) {
             lives--;
             updateLifeImage();
-        }   //removes 1 life and switches the image (calls the function)
-            //if and only if lives >0
-
+        }
         if (lives <= 0) {
             System.out.println("Game Over");
             timeline.stop();
             wordLabel.setText("GAME OVER");
             inputField.setDisable(true);
-        }   //
+        }
     }
 
+    /**
+     * Actualiza la imagen del sol segun la cantidad de vidas restantes.
+     */
     private void updateLifeImage() {
         if (lives > 0 && lives <= 4) {
             SunImages.setImage(new Image(getClass().getResource(sunImages[4 - lives]).toExternalForm()));
         }
     }
 
+    /**
+     * Establece una imagen en el componente de imagen del sol.
+     *
+     * @param image Imagen a mostrar.
+     */
     public void setImage(Image image) {
         if (SunImages != null) {
             SunImages.setImage(image);
-
         }
     }
-
 }
